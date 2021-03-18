@@ -1,8 +1,7 @@
 type socket = Phoenix.Socket.t;
 type channel = Phoenix.Channel.t;
 
-module RR = ReasonReact;
-let str = RR.string;
+let str = React.string;
 
 /* Helpers */
 
@@ -60,72 +59,78 @@ module Make = (()) => {
         ~handleEvent,
         ~handleSync=defaultSync,
         (),
-      ) =>
-    ReactCompat.useRecordApi({
-      ...ReactCompat.component,
+      ) => {
+    let (state, dispatch) =
+      React.useReducer(
+        (_state, action) =>
+          switch (action) {
+          | LeaveChannel(channel) =>
+            let _ = Phoenix.Channel.leave(channel);
+            ();
 
-      initialState: () => Initialized,
-      reducer: (action, _state) =>
-        switch (action) {
-        | LeaveChannel(channel) =>
-          UpdateWithSideEffects(
-            Left,
-            _self => {
-              let _ = Phoenix.Channel.leave(channel);
-              ();
-            },
-          )
-        | ChannelJoined(channel) => Update(Joined(channel))
-        | ChannelFailed => Update(Left)
-        | ChannelClosed => Update(Left)
-        },
-      didMount: ({send, onUnmount}) => {
-        Js.log("Mounted");
-        let myChannel = Phoenix.Socket.channel(topic, socket);
+            Left;
+          | ChannelJoined(channel) => Joined(channel)
+          | ChannelFailed => Left
+          | ChannelClosed => Left
+          },
+        Initialized,
+      );
+    // this is unused
+    // let leaveChannel = channel => {
+    //   dispatch(LeaveChannel(channel));
+    //   let _ = Phoenix.Channel.leave(channel);
+    //   ();
+    // };
 
-        if (withPresence) {
-          let myPresence = Phoenix.Presence.init(myChannel);
+    React.useEffect0(() => {
+      Js.log("Mounted");
+      let myChannel = Phoenix.Socket.channel(topic, socket);
 
-          let _ = myPresence##onJoin(() => Js.log("Presence joined!"));
+      if (withPresence) {
+        let myPresence = Phoenix.Presence.init(myChannel);
 
-          let _ =
-            myPresence##onSync(() => {
-              Js.log(myPresence##list);
-              Js.log("------------");
-
-              /* let loggedInUsers = myPresence##list(listBy);
-                 handleSync(topic, loggedInUsers); */
-
-              handleSync(topic, myPresence##list);
-            });
-          ();
-        };
+        let _ = myPresence##onJoin(() => Js.log("Presence joined!"));
 
         let _ =
-          myChannel
-          |> putOn("ping", handleEvent("ping"))
-          |> joinChannel(_)
-          |> putReceive("ok", handleReceive("ok"))
-          |> putReceive("error", handleReceive("error"))
-          |> putReceive("timeout", handleReceive("timeout"));
+          myPresence##onSync(() => {
+            Js.log(myPresence##list);
+            Js.log("------------");
 
-        /* let _ = myChannel
-           |> putOnError(handleEvent("error"))
-           |> putOnClose();  */
+            /* let loggedInUsers = myPresence##list(listBy);
+               handleSync(topic, loggedInUsers); */
 
-        send(ChannelJoined(myChannel));
+            handleSync(topic, myPresence##list);
+          });
+        ();
+      };
 
-        onUnmount(() => {
+      let _ =
+        myChannel
+        |> putOn("ping", handleEvent("ping"))
+        |> joinChannel(_)
+        |> putReceive("ok", handleReceive("ok"))
+        |> putReceive("error", handleReceive("error"))
+        |> putReceive("timeout", handleReceive("timeout"));
+
+      /* let _ = myChannel
+         |> putOnError(handleEvent("error"))
+         |> putOnClose();  */
+
+      dispatch(ChannelJoined(myChannel));
+
+      Some(
+        () => {
           Js.log("Disconnect channel!");
           let _ = Phoenix.Channel.leave(myChannel);
           ();
-        });
-      },
-      render: ({state}) =>
-        switch (state) {
-        | Initialized => <div> {str("Initialized...")} </div>
-        | Left => <div> {str("Left...")} </div>
-        | Joined(channel) => render(channel)
         },
+      );
     });
+
+    switch (state) {
+    | Initialized => <div> {str("Initialized...")} </div>
+    | Left => <div> {str("Left...")} </div>
+    | Joined(channel) => render(channel)
+    };
+  };
 };

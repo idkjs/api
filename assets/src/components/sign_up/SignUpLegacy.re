@@ -102,48 +102,50 @@ type state =
   | Loading;
 
 type action =
-  | Load
+  | Load(SpecialForm.state)
   | Loaded(sessionData)
   | Failed(string);
-
+// type formState
+// = SpecialForm.form;
 [@react.component]
 let make = (~handleSubmit, ()) => {
-  let (state, dispatch) =
-    React.useReducer(
-      (_state, action) =>
+  let (state, send) =
+    ReactUpdateLegacy.useReducerWithMapState(
+      () => Display,
+      (action, _state) =>
         switch (action) {
-        | Load => Loading
+        | Load(data) =>
+          let {name, email, password} = data.values;
 
+          UpdateWithSideEffects(
+            Loading,
+            ({send}) =>
+              Js.Promise.(
+                Api.signUp({
+                  "user": {
+                    "name": name,
+                    "email": email,
+                    "password": password,
+                  },
+                })
+                |> then_(result =>
+                     switch (result) {
+                     | Belt.Result.Ok(sessionData) =>
+                       resolve(send(Loaded(sessionData)))
+                     | Belt.Result.Error(_errorObj) =>
+                       resolve(send(Failed("Could not create account.")))
+                     }
+                   )
+                |> ignore
+              ),
+          );
         | Loaded(sessionData) =>
           handleSubmit(sessionData);
-          Display;
-        | Failed(error) => DisplayWithErrors(error)
+          Update(Display);
+        | Failed(error) => Update(DisplayWithErrors(error))
         },
-      Display,
     );
 
-  let load = (data: SpecialForm.state) => {
-    let {name, email, password} = data.values;
-    dispatch(Load);
-    Js.Promise.(
-      Api.signUp({
-        "user": {
-          "name": name,
-          "email": email,
-          "password": password,
-        },
-      })
-      |> then_(result =>
-           switch (result) {
-           | Belt.Result.Ok(sessionData) =>
-             resolve(dispatch(Loaded(sessionData)))
-           | Belt.Result.Error(errorMsg) =>
-             resolve(dispatch(Failed(errorMsg)))
-           }
-         )
-      |> ignore
-    );
-  };
   <div>
     {switch (state) {
      | Display => ReasonReact.null
@@ -158,7 +160,7 @@ let make = (~handleSubmit, ()) => {
         <form
           onSubmit={e => {
             preventDefault(e);
-            load(form);
+            send(Load(formState.form));
           }}>
           <div className="form-group">
             <label htmlFor="registerUserName"> {str("Name: ")} </label>

@@ -30,9 +30,7 @@ let handleEvent = (event, response) => {
   ();
 };
 
-module RR = ReasonReact;
-
-let str = RR.string;
+let str = React.string;
 
 type presence = Abstract.PresenceData.t;
 
@@ -43,76 +41,68 @@ let initialState = {systemPresences: []};
 type action =
   | UpdatePresence(string, list(presence));
 
-let reducer = (action, _state) =>
+let reducer = (state, action) =>
   switch (action) {
   | UpdatePresence(topic, loggedInUsers) =>
     switch (topic) {
-    | "system" => ReactCompat.Update({systemPresences: loggedInUsers})
+    | "system" => {systemPresences: loggedInUsers}
     | _ =>
       Js.log("topic not matched : " ++ topic);
-      NoUpdate;
+      state;
     }
   };
 
 [@react.component]
-let make = (~token, ~userName, ~userId, ()) =>
-  ReactCompat.useRecordApi({
-    ...ReactCompat.component,
+let make = (~token, ~userName, ~userId, ()) => {
+  let (_state, dispatch) = React.useReducer(reducer, initialState);
+  let handleSync = (topic, loggedInUsers) => {
+    let _ = Js.log(("handleSync:" ++ topic, loggedInUsers));
 
-    initialState: () => initialState,
-    reducer,
-    render: self => {
-      let handleSync = (topic, loggedInUsers) => {
-        let _ = Js.log(("handleSync:" ++ topic, loggedInUsers));
+    dispatch(UpdatePresence(topic, []));
+  };
 
-        self.send(UpdatePresence(topic, []));
-      };
+  <div>
+    <h2> {str(userName)} </h2>
+    <p> {str("Id: " ++ string_of_int(userId))} </p>
+    <p> {str("Token: " ++ token)} </p>
+    <SpecialSocket
+      endPoint
+      socketOpts={socketOpts(token)}
+      render={socket => {
+        Js.log("Socket joined");
 
-      <div>
-        <h2> {str(userName)} </h2>
-        <p> {str("Id: " ++ string_of_int(userId))} </p>
-        <p> {str("Token: " ++ token)} </p>
-        <SpecialSocket
-          endPoint
-          socketOpts={socketOpts(token)}
-          render={socket => {
-            Js.log("Socket joined");
-
-            let systemTopic = "system";
-            let privateTopic = "user:" ++ string_of_int(userId);
-            <div>
-              <p> {str("Socket connected!")} </p>
-              <SpecialChannel
-                topic=systemTopic
-                socket
-                handleEvent
-                handleReceive
-                withPresence=true
-                handleSync
-                render={channel => {
-                  Js.log("Channel joined with topic : " ++ channel##topic);
-
-                  <p>
-                    {str("Channel connected with topic : " ++ systemTopic)}
-                  </p>;
-                }}
-              />
-              <SpecialChannel
-                topic=privateTopic
-                socket
-                handleEvent
-                handleReceive
-                render={channel => {
-                  Js.log("Channel joined with topic : " ++ channel##topic);
-
-                  <p>
-                    {str("Channel connected with topic : " ++ privateTopic)}
-                  </p>;
-                }}
-              />
-            </div>;
-          }}
-        />
-      </div>;
-    },
-  });
+        let systemTopic = "system";
+        let privateTopic = "user:" ++ string_of_int(userId);
+        <div>
+          <p> {str("Socket connected!")} </p>
+          <SpecialChannel
+            topic=systemTopic
+            socket
+            handleEvent
+            handleReceive
+            withPresence=true
+            handleSync
+            render={channel => {
+              Js.log("Channel joined with topic : " ++ channel##topic);
+              <p>
+                {str("Channel connected with topic : " ++ systemTopic)}
+              </p>;
+            }}
+          />
+          <SpecialChannel
+            topic=privateTopic
+            socket
+            handleEvent
+            handleReceive
+            render={channel => {
+              Js.log("Channel joined with topic : " ++ channel##topic);
+              <p>
+                {str("Channel connected with topic : " ++ privateTopic)}
+              </p>;
+            }}
+          />
+        </div>;
+      }}
+    />
+  </div>;
+};

@@ -81,96 +81,95 @@ type state =
   | Loading;
 
 type action =
-  | Load(SpecialForm.state)
+  | Load
   | Loaded(sessionData)
   | Failed(string);
 
 [@react.component]
-let make = (~handleSubmit, ()) =>
-  ReactCompat.useRecordApi({
-    ...ReactCompat.component,
+let make = (~handleSubmit, ()) => {
+  let (state, dispatch) =
+    React.useReducer(
+      (_state, action) =>
+        switch (action) {
+        | Load => Loading
 
-    initialState: () => Display,
-    reducer: (action, _state) =>
-      switch (action) {
-      | Load(data) =>
-        let {name, password} = data.values;
+        | Loaded(sessionData) =>
+          handleSubmit(sessionData);
+          Display;
+        | Failed(error) => DisplayWithErrors(error)
+        },
+      Display,
+    );
 
-        UpdateWithSideEffects(
-          Loading,
-          self =>
-            Js.Promise.(
-              Api.signIn({
-                "session": {
-                  "name": name,
-                  "password": password,
-                },
-              })
-              |> then_(result =>
-                   switch (result) {
-                   | Belt.Result.Ok(sessionData) =>
-                     resolve(self.send(Loaded(sessionData)))
-                   | Belt.Result.Error(errorMsg) =>
-                     resolve(self.send(Failed(errorMsg)))
-                   }
-                 )
-              |> ignore
-            ),
-        );
-      | Loaded(sessionData) =>
-        handleSubmit(sessionData);
-        Update(Display);
-      | Failed(error) => Update(DisplayWithErrors(error))
-      },
-    render: self =>
-      <div>
-        {switch (self.state) {
-         | Display => React.null
-         | DisplayWithErrors(error) => <p> {str(error)} </p>
-         | Loading => <p> {str("Loading...")} </p>
-         }}
-        <SpecialForm
-          initialState={name: "", password: ""}
-          rules
-          render={(formState: SpecialForm.form) => {
-            let {form, handleChange} = formState;
-            <form
-              onSubmit={e => {
-                preventDefault(e);
-                self.send(Load(form));
-              }}>
-              <div className="form-group">
-                <label htmlFor="userName"> {str("Name: ")} </label>
-                <input
-                  id="userName"
-                  placeholder="Name"
-                  value={form.values.name}
-                  onChange={e => getValue(e) |> handleChange(Name)}
-                  className={getInputClass(Name, form.errors)}
-                  required=true
-                />
-                <div className="invalid-feedback">
-                  {getError(Name, form.errors)}
-                </div>
-              </div>
-              <div className="form-group">
-                <label htmlFor="userPassword"> {str("Password: ")} </label>
-                <input
-                  id="userPassword"
-                  placeholder="Password"
-                  type_="password"
-                  value={form.values.password}
-                  onChange={e => getValue(e) |> handleChange(Password)}
-                  className={getInputClass(Password, form.errors)}
-                  required=true
-                />
-                <div className="invalid-feedback">
-                  {getError(Password, form.errors)}
-                </div>
-              </div>
-              <button className="btn btn-primary"> {str("Sign In")} </button>
-            </form>;
-          }}
-        />
-      </div>,
-  });
+  let load = (data: SpecialForm.state) => {
+    let {name, password} = data.values;
+    dispatch(Load);
+    Js.Promise.(
+      Api.signIn({
+        "session": {
+          "name": name,
+          "password": password,
+        },
+      })
+      |> then_(result =>
+           switch (result) {
+           | Belt.Result.Ok(sessionData) =>
+             resolve(dispatch(Loaded(sessionData)))
+           | Belt.Result.Error(errorMsg) =>
+             resolve(dispatch(Failed(errorMsg)))
+           }
+         )
+      |> ignore
+    );
+  };
+  <div>
+    {switch (state) {
+     | Display => React.null
+     | DisplayWithErrors(error) => <p> {str(error)} </p>
+     | Loading => <p> {str("Loading...")} </p>
+     }}
+    <SpecialForm
+      initialState={name: "", password: ""}
+      rules
+      render={(formState: SpecialForm.form) => {
+        let {form, handleChange} = formState;
+        <form
+          onSubmit={e => {
+            preventDefault(e);
+            load(form);
+          }}>
+          <div className="form-group">
+            <label htmlFor="userName"> {str("Name: ")} </label>
+            <input
+              id="userName"
+              placeholder="Name"
+              value={form.values.name}
+              onChange={e => getValue(e) |> handleChange(Name)}
+              className={getInputClass(Name, form.errors)}
+              required=true
+            />
+            <div className="invalid-feedback">
+              {getError(Name, form.errors)}
+            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="userPassword"> {str("Password: ")} </label>
+            <input
+              id="userPassword"
+              placeholder="Password"
+              type_="password"
+              value={form.values.password}
+              onChange={e => getValue(e) |> handleChange(Password)}
+              className={getInputClass(Password, form.errors)}
+              required=true
+            />
+            <div className="invalid-feedback">
+              {getError(Password, form.errors)}
+            </div>
+          </div>
+          <button className="btn btn-primary"> {str("Sign In")} </button>
+        </form>;
+      }}
+    />
+  </div>;
+};

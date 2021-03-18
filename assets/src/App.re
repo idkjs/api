@@ -35,125 +35,118 @@ let initialState = {
   signMode: SignInMode,
 };
 
-// module RR = ReasonReact;
 let str = React.string;
 
-let reducer = (action, state) =>
+let reducer = (state, action) =>
   switch (action) {
-  | AppBootup =>
-    ReactCompat.Update({...state, bootupTime: Some(Js.Date.now())})
+  | AppBootup => {...state, bootupTime: Some(Js.Date.now())}
   | Login(sessionData) =>
-    UpdateWithSideEffects(
-      {...state, isAuthenticated: true, sessionData: Some(sessionData)},
-      _self => AuthService.saveToken(sessionData.token),
-    )
+    AuthService.saveToken(sessionData.token);
+
+    {...state, isAuthenticated: true, sessionData: Some(sessionData)};
+
   | Logout =>
-    UpdateWithSideEffects(
-      {...state, isAuthenticated: false, sessionData: None},
-      _self => AuthService.removeToken(),
-    )
+    AuthService.removeToken();
+    {...state, isAuthenticated: false, sessionData: None};
   | RefreshToken(token) =>
-    UpdateWithSideEffects(
-      {...state, loading: true},
-      self =>
-        Js.Promise.(
-          Api.refreshToken(token)
-          |> then_(result =>
-               switch (result) {
-               | Belt.Result.Ok(sessionData) =>
-                 resolve(self.send(RefreshSucceed(sessionData)))
-               | Belt.Result.Error(_errorMsg) =>
-                 resolve(self.send(RefreshFailed))
-               }
-             )
-          |> ignore
-        ),
-    )
+    Js.log("Token to reload is: " ++ token);
+    {...state, loading: true};
+
   | RefreshSucceed(sessionData) =>
-    UpdateWithSideEffects(
-      {
-        ...state,
-        loading: false,
-        isAuthenticated: true,
-        sessionData: Some(sessionData),
-      },
-      _self => AuthService.saveToken(sessionData.token),
-    )
+    AuthService.saveToken(sessionData.token);
+    {
+      ...state,
+      loading: false,
+      isAuthenticated: true,
+      sessionData: Some(sessionData),
+    };
   | RefreshFailed =>
-    UpdateWithSideEffects(
-      {...state, loading: false, isAuthenticated: false, sessionData: None},
-      _self => AuthService.removeToken(),
-    )
+    AuthService.removeToken();
+    {...state, loading: false, isAuthenticated: false, sessionData: None};
+
   | ToggleSignMode =>
     let newSignMode =
       switch (state.signMode) {
       | SignInMode => SignUpMode
       | SignUpMode => SignInMode
       };
-    Update({...state, signMode: newSignMode});
+    {...state, signMode: newSignMode};
   };
 
 [@react.component]
-let make = () =>
-  ReactCompat.useRecordApi({
-    ...ReactCompat.component,
+let make = () => {
+  let (state, dispatch) = React.useReducer(reducer, initialState);
+  let refreshToken = token => {
+    dispatch(RefreshToken(token));
 
-    initialState: () => initialState,
-    reducer,
-    didMount: ({send}) => {
-      send(AppBootup);
-      switch (AuthService.loadToken()) {
-      | Some(token) => send(RefreshToken(token))
-      | None => Js.log("No token to reload from...")
-      };
-    },
-    render: ({send, state}) =>
-      if (state.loading) {
-        <p> {str("Loading...")} </p>;
-      } else {
-        <div>
-          <header>
-            {switch (state.bootupTime) {
-             | Some(bootupTime) =>
-               <p> {str(Tools.formatTimestamp(bootupTime))} </p>
-             | None => <p> {str("Bootup time is not set!")} </p>
-             }}
-          </header>
-          <main role="main" className="container">
-            {state.isAuthenticated
-               ? <div>
-                   <button
-                     onClick={_event => send(Logout)}
-                     className="btn btn-link">
-                     {str("Log Out")}
-                   </button>
-                   {switch (state.sessionData) {
-                    | Some(sessionData) =>
-                      <Member
-                        token={sessionData.token}
-                        userName={sessionData.currentUser.name}
-                        userId={sessionData.currentUser.id}
-                      />
-                    | None => React.null
-                    }}
-                 </div>
-               : <div>
-                   {switch (state.signMode) {
-                    | SignInMode =>
-                      <SignIn handleSubmit={values => send(Login(values))} />
-                    | SignUpMode =>
-                      <SignUp handleSubmit={values => send(Login(values))} />
-                    }}
-                   <button
-                     onClick={_event => send(ToggleSignMode)}
-                     className="btn btn-link">
-                     {str(toggleLabelOfSignMode(state.signMode))}
-                   </button>
-                 </div>}
-          </main>
-        </div>;
-      },
+    Js.Promise.(
+      Api.refreshToken(token)
+      |> then_(result =>
+           switch (result) {
+           | Belt.Result.Ok(sessionData) =>
+             resolve(dispatch(RefreshSucceed(sessionData)))
+           | Belt.Result.Error(_errorMsg) =>
+             resolve(dispatch(RefreshFailed))
+           }
+         )
+      |> ignore
+    );
+  };
+  React.useEffect0(() => {
+    dispatch(AppBootup);
+    switch (AuthService.loadToken()) {
+    | Some(token) => refreshToken(token)
+    | None => Js.log("No token to reload from...")
+    };
+    None;
   });
+
+  if (state.loading) {
+    <p> {str("Loading...")} </p>;
+  } else {
+    <div>
+      <header>
+        {switch (state.bootupTime) {
+         | Some(bootupTime) =>
+           <p> {str(Tools.formatTimestamp(bootupTime))} </p>
+         | None => <p> {str("Bootup time is not set!")} </p>
+         }}
+      </header>
+      <main role="main" className="container">
+        {state.isAuthenticated
+           ? <div>
+               <button
+                 onClick={_event => dispatch(Logout)}
+                 className="btn btn-link">
+                 {str("Log Out")}
+               </button>
+               {switch (state.sessionData) {
+                | Some(sessionData) =>
+                  <Member
+                    token={sessionData.token}
+                    userName={sessionData.currentUser.name}
+                    userId={sessionData.currentUser.id}
+                  />
+                | None => React.null
+                }}
+             </div>
+           : <div>
+               {switch (state.signMode) {
+                | SignInMode =>
+                  <SignIn handleSubmit={values => dispatch(Login(values))} />
+                | SignUpMode =>
+                  <SignUp handleSubmit={values => dispatch(Login(values))} />
+                }}
+               <button
+                 onClick={_event => dispatch(ToggleSignMode)}
+                 className="btn btn-link">
+                 {str(toggleLabelOfSignMode(state.signMode))}
+               </button>
+             </div>}
+      </main>
+    </div>;
+  };
+};
 
 /*
  type page =
@@ -167,7 +160,7 @@ let make = () =>
 
  module Config = {
    type route = page;
-   let toRoute = (url: ReasonReact.Router.url) =>
+   let toRoute = (url: ReasonReactRouter.url) =>
      switch (url.path) {
      | []           => Home
      | ["users"]    => Users
