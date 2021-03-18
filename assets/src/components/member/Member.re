@@ -1,19 +1,23 @@
-module SpecialSocket = CreateSocket.Make();
+module SpecialSocket =
+  CreateSocket.Make({});
 
-module SpecialChannel = CreateChannel.Make();
+module SpecialChannel =
+  CreateChannel.Make({});
 
 let endPoint = "ws://localhost:4000/socket";
 
-let socketOpts = token => [%bs.obj {
-  params: {token: token},
-  timeout: 10000,
-  logger: (kind, msg, data) => Js.log(kind ++ ": " ++ msg ++ ", " ++ data)
-}];
-
-/* Callbacks */
+let socketOpts = token => {
+let token = {"token": token};
+  {
+  "params": {
+    token
+  },
+  "timeout": 10000,
+  "logger": (kind, msg, data) => Js.log(kind ++ ": " ++ msg ++ ", " ++ data),
+}};
 
 let handleReceive = (event, any) =>
-  switch event {
+  switch (event) {
   | "ok" => Js.log(("handleReiceive:" ++ event, "Joined"))
   | "error" => Js.log(("handleReiceive:" ++ event, "Failed to join channel"))
   | _ => Js.log(("handleReiceive:" ++ event, any))
@@ -24,72 +28,58 @@ let handleEvent = (event, response) => {
   ();
 };
 
-/* React Component */
-
 module RR = ReasonReact;
 
 let str = RR.string;
 
 type presence = Abstract.PresenceData.t;
 
-type state = {
-  systemPresences: list(presence)
-};
+type state = {systemPresences: list(presence)};
 
-let initialState = {
-  systemPresences: []
-};
+let initialState = {systemPresences: []};
 
-type action = 
+type action =
   | UpdatePresence(string, list(presence));
 
-let reducer = (action, _state) => 
+let reducer = (action, _state) =>
   switch (action) {
-  | UpdatePresence(topic, loggedInUsers) => 
+  | UpdatePresence(topic, loggedInUsers) =>
     switch (topic) {
-    | "system" => 
-      RR.Update({systemPresences: loggedInUsers})
-    | _ => {
-      Js.log("topic not matched : " ++ topic)
-      RR.NoUpdate
+    | "system" => ReactCompat.Update({systemPresences: loggedInUsers})
+    | _ =>
+      Js.log("topic not matched : " ++ topic);
+      NoUpdate;
     }
-    };
   };
 
-let component = RR.reducerComponent("Member");
-let make = (~token, ~userName, ~userId, _children) => {
-  ...component,
-  initialState: () => initialState,
-  reducer,
-  render: self => {
-    
-    let handleSync = (topic, loggedInUsers) => {
-      let _ = Js.log(("handleSync:" ++ topic, loggedInUsers));
+[@react.component]
+let make = (~token, ~userName, ~userId, ()) =>
+  ReactCompat.useRecordApi({
+    ...ReactCompat.component,
 
-      /* 
-      TODO, transform loggedInUsers into a list of presence!
-       */
+    initialState: () => initialState,
+    reducer,
+    render: self => {
+      let handleSync = (topic, loggedInUsers) => {
+        let _ = Js.log(("handleSync:" ++ topic, loggedInUsers));
 
-      /* self.send(UpdatePresence(topic, loggedInUsers)); */
-      self.send(UpdatePresence(topic, []));
-    };
+        self.send(UpdatePresence(topic, []));
+      };
 
-    <div> 
-      <h2> (str(userName)) </h2> 
-      <p> (str("Id: " ++ string_of_int(userId))) </p> 
-      <p> (str("Token: " ++ token)) </p> 
-      <SpecialSocket
-        endPoint
-        socketOpts=socketOpts(token)
-        render=(
-          socket => {
-            /* At this level, I receive the socket from SpecialSocket! */
+      <div>
+        <h2> {str(userName)} </h2>
+        <p> {str("Id: " ++ string_of_int(userId))} </p>
+        <p> {str("Token: " ++ token)} </p>
+        <SpecialSocket
+          endPoint
+          socketOpts={socketOpts(token)}
+          render={socket => {
             Js.log("Socket joined");
 
             let systemTopic = "system";
             let privateTopic = "user:" ++ string_of_int(userId);
             <div>
-              <p>(str("Socket connected!"))</p>
+              <p> {str("Socket connected!")} </p>
               <SpecialChannel
                 topic=systemTopic
                 socket
@@ -97,33 +87,30 @@ let make = (~token, ~userName, ~userId, _children) => {
                 handleReceive
                 withPresence=true
                 handleSync
-                render=(
-                  channel => {
-                    /* At this level, I receive the channel from SpecialChannel! */
-                    Js.log("Channel joined with topic : " ++ channel##topic);
+                render={channel => {
+                  Js.log("Channel joined with topic : " ++ channel##topic);
 
-                    <p>(str("Channel connected with topic : " ++ systemTopic))</p>
-                  }
-                )
+                  <p>
+                    {str("Channel connected with topic : " ++ systemTopic)}
+                  </p>;
+                }}
               />
               <SpecialChannel
                 topic=privateTopic
                 socket
                 handleEvent
                 handleReceive
-                render=(
-                  channel => {
-                    /* At this level, I receive the channel from SpecialChannel! */
-                    Js.log("Channel joined with topic : " ++ channel##topic);
+                render={channel => {
+                  Js.log("Channel joined with topic : " ++ channel##topic);
 
-                    <p>(str("Channel connected with topic : " ++ privateTopic))</p>
-                  }
-                )
+                  <p>
+                    {str("Channel connected with topic : " ++ privateTopic)}
+                  </p>;
+                }}
               />
-            </div>
-          }
-        )
-      />
-    </div>
-  },
-};
+            </div>;
+          }}
+        />
+      </div>;
+    },
+  });

@@ -27,10 +27,12 @@ module Configuration = {
 };
 
 let minLengthPassord = (value, _values) => String.length(value) >= 6;
-let validateEmail = (value, _values) => 
-  /* Do not put // in the regex! */
-  Js.Re.fromString("^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$")
-  |> Js.Re.test(value);
+
+let validateEmail = (value, _values) =>{
+
+  let regex = Revamp.Compiled.make("^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$");
+
+  regex|> Revamp.Compiled.test(_,value)};
 
 let emptyMsg = "Field is required";
 
@@ -42,7 +44,7 @@ let rules = [
       (CreateForm.NotEmpty, emptyMsg),
       (CreateForm.Custom(validateEmail), "Email is not valid."),
     ],
-  ), 
+  ),
   (
     Password,
     [
@@ -90,36 +92,38 @@ let preventDefault = event => ReactEvent.Synthetic.preventDefault(event);
 type user = Abstract.User.t;
 type sessionData = Abstract.SessionData.t;
 
-type state = 
+type state =
   | Display
   | DisplayWithErrors(string)
   | Loading;
 
-type action = 
+type action =
   | Load(SpecialForm.state)
   | Loaded(sessionData)
   | Failed(string);
-
-let component = ReasonReact.reducerComponent("Form");
-let make = (~handleSubmit, _children) => {
-  ...component,
-  initialState: () => Display,
-  reducer: (action, _state) => {
-    switch (action) {
+// type formState
+// = SpecialForm.form;
+[@react.component]
+let make = (~handleSubmit, ()) => {
+  let (state, send) =
+    ReactUpdateLegacy.useReducerWithMapState(
+      () => Display,
+      (action, _state) =>
+         switch (action) {
     | Load(data) => {
       let {name: name, email: email, password: password} = data.values;
 
-      ReasonReact.UpdateWithSideEffects(
+      UpdateWithSideEffects(
         Loading,
-        self => 
+        ({send}) =>
           Js.Promise.(
             Api.signUp({"user": {"name": name, "email": email, "password": password}})
-            |> then_(result => 
+            |> then_(result =>
               switch (result) {
                 | Belt.Result.Ok(sessionData) =>
-                  resolve(self.send(Loaded(sessionData)))
-                | Belt.Result.Error(_errorObj) => 
-                  resolve(self.send(Failed("Could not create account.")))
+                  resolve(send(Loaded(sessionData)))
+                | Belt.Result.Error(_errorObj) =>
+                  resolve(send(Failed("Could not create account.")))
                 }
             )
             |> ignore
@@ -128,15 +132,14 @@ let make = (~handleSubmit, _children) => {
     }
     | Loaded(sessionData) => {
       handleSubmit(sessionData);
-      ReasonReact.Update(Display)
+      Update(Display)
     }
-    | Failed(error) => ReasonReact.Update(DisplayWithErrors(error));
-    };
-  },
-  render: self =>
+    | Failed(error) => Update(DisplayWithErrors(error));
+  });
+
     <div>
       {
-        switch (self.state) {
+        switch (state) {
         | Display => ReasonReact.null
         | DisplayWithErrors(error) => <p>(str(error))</p>
         | Loading => <p>(str("Loading..."))</p>
@@ -146,12 +149,14 @@ let make = (~handleSubmit, _children) => {
         initialState={name: "", email: "", password: ""}
         rules
         render=(
-          ({form, handleChange}) =>
+          (formState:SpecialForm.form) =>{
+
+            let {form,handleChange}=formState;
             <form
               onSubmit=(
                 e => {
                   preventDefault(e);
-                  self.send(Load(form));
+                  send(Load(formState.form));
                 }
               )>
               <div className="form-group">
@@ -193,7 +198,7 @@ let make = (~handleSubmit, _children) => {
               </div>
               <button className="btn btn-primary"> (str("Sign Up")) </button>
             </form>
-        )
+        })
       />
-    </div>,
+    </div>
 };

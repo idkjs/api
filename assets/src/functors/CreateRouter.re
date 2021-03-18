@@ -15,28 +15,30 @@ module Make = (Config: Config) => {
   type state = {route};
   type action =
     | UpdateRoute(route);
-  let component = ReasonReact.reducerComponent("Router");
-  let make = (~render, _children) => {
-    ...component,
-    initialState: () => {
-      route: ReasonReact.Router.dangerouslyGetInitialUrl()
-        |> Config.toRoute,
-    },
-    reducer: (action, _state) =>
-      switch (action) {
-      | UpdateRoute(route) => ReasonReact.Update({route: route})
+
+  [@react.component]
+  let make = (~render, ()) =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+
+      initialState: () => {
+        route: ReasonReact.Router.dangerouslyGetInitialUrl() |> Config.toRoute,
       },
-    didMount: self => {
-      let watcherID = ReasonReact.Router.watchUrl(url => 
-        self.send(UpdateRoute(Config.toRoute(url)))
-      );
-      self.onUnmount(() => ReasonReact.Router.unwatchUrl(watcherID));
-    },
-    render: self =>
-      render({
-        updateRoute: route => self.send(UpdateRoute(route)),
-        route: self.state.route,
-      }),
-  };
+      reducer: (action, _state) =>
+        switch (action) {
+        | UpdateRoute(route) => Update({route: route})
+        },
+      didMount: self => {
+        let watcherID =
+          ReasonReact.Router.watchUrl(url =>
+            self.send(UpdateRoute(Config.toRoute(url)))
+          );
+        self.onUnmount(() => ReasonReact.Router.unwatchUrl(watcherID));
+      },
+      render: self =>
+        render({
+          updateRoute: route => self.send(UpdateRoute(route)),
+          route: self.state.route,
+        }),
+    });
 };
-      

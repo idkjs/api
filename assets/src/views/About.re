@@ -1,7 +1,9 @@
-let str = ReasonReact.string;
+let str = React.string;
 
-let component = ReasonReact.statelessComponent("About");
-let make = _children => {
-    ...component,
-    render: _self => <div> <h2> (str("About")) </h2> </div>,
-};
+[@react.component]
+let make = () =>
+  ReactCompat.useRecordApi({
+    ...ReactCompat.component,
+
+    render: _self => <div> <h2> {str("About")} </h2> </div>,
+  });

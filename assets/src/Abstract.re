@@ -1,13 +1,13 @@
 module User = {
   type t = {
     id: int,
-    name: string
-  };  
+    name: string,
+  };
 };
 
 module SessionData = {
   type t = {
-    currentUser: User.t, 
+    currentUser: User.t,
     token: string,
   };
 };
@@ -18,5 +18,5 @@ module PresenceData = {
     id: int,
     online_at: int,
     phx_ref: string,
-  }
-}
+  };
+};

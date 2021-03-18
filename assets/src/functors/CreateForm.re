@@ -29,8 +29,8 @@ let validation = (rules, get, data) =>
       }
       |> (
         fieldErrors =>
-          List.length(fieldErrors) > 0 ?
-            List.append(errors, [(field, fieldErrors)]) : errors
+          List.length(fieldErrors) > 0
+            ? List.append(errors, [(field, fieldErrors)]) : errors
       ),
     [],
     rules,
@@ -57,22 +57,21 @@ module Make = (Config: Config) => {
   };
   type action =
     | UpdateValues(field, t);
-  let component = ReasonReact.reducerComponent("FormComponent");
-  let make = (~initialState, ~rules, ~render, _children) => {
-    ...component,
-    initialState: () => {errors: [], values: initialState},
-    reducer: (action, state) =>
-      switch (action) {
-      | UpdateValues(name, value) =>
-        let values = Config.update(name, value, state.values);
-        ReasonReact.Update({
-          values,
-          errors: validation(rules, Config.get, values),
-        });
-      },
-    render: ({state, send}) => {
-      let handleChange = (field, value) => send(UpdateValues(field, value));
-      render({form: state, handleChange});
-    },
+
+  [@react.component]
+  let make = (~initialState, ~rules, ~render, ()) => {
+    let (state, send) =
+      ReactUpdateLegacy.useReducerWithMapState(
+        () => {errors: [], values: initialState},
+        (action, state) =>
+          switch (action) {
+          | UpdateValues(name, value) =>
+            let values = Config.update(name, value, state.values);
+            Update({values, errors: validation(rules, Config.get, values)});
+          },
+      );
+
+    let handleChange = (field, value) => send(UpdateValues(field, value));
+    render({form: state, handleChange});
   };
 };
