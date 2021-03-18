@@ -1,21 +1,13 @@
-module Abstract = {
-  type nonrec void = unit;
-  type nonrec function_ = unit => unit;
-  type nonrec any = Js_json.t;
-};
-
 module Push = {
-  open Abstract;
   type t = {
     .
-    [@meth] "resend": float => void,
-    [@meth] "send": unit => void,
-    [@meth] "receive": (string, any => void) => t,
+    [@meth] "resend": float => unit,
+    [@meth] "send": unit => unit,
+    [@meth] "receive": (string, Js.Json.t => unit) => t,
   };
 };
 
 module Channel = {
-  open Abstract;
   type nonrec ref = int;
   type nonrec t = {
     .
@@ -24,9 +16,9 @@ module Channel = {
     [@meth] "rejoinUntilConnected": unit => unit,
     [@meth] "onClose": unit => unit,
     [@meth] "onError": unit => unit,
-    [@meth] "on": (string, any => unit) => ref,
+    [@meth] "on": (string, Js.Json.t => unit) => ref,
     [@meth] "off": (string, ref) => unit,
-    [@meth] "onMessage": (string, any, any) => any,
+    [@meth] "onMessage": (string, Js.Json.t, Js.Json.t) => Js.Json.t,
   };
 
   [@bs.send] external join: (t, ~timeout: float=?, unit) => Push.t = "join";
@@ -46,18 +38,17 @@ module Channel = {
 };
 
 module Socket = {
-  open Abstract;
   type nonrec t = {
     .
     [@meth] "protocol": unit => string,
     [@meth] "endPointURL": unit => string,
-    [@meth] "log": (string, string, any) => void,
+    [@meth] "log": (string, string, Js.Json.t) => unit,
     [@meth] "hasLogger": unit => bool,
-    [@meth] "onOpen": function_ => void,
-    [@meth] "onClose": function_ => void,
-    [@meth] "onError": function_ => void,
-    [@meth] "onMessage": function_ => void,
-    [@meth] "connectionState": unit => void,
+    [@meth] "onOpen": (unit => unit) => unit,
+    [@meth] "onClose": (unit => unit) => unit,
+    [@meth] "onError": (unit => unit) => unit,
+    [@meth] "onMessage": (unit => unit) => unit,
+    [@meth] "connectionState": unit => unit,
     [@meth] "isConnected": unit => bool,
   };
 
@@ -79,7 +70,7 @@ module Socket = {
   external disconnect:
     (
       t,
-      ~callback: function_=?,
+      ~callback: unit => unit=?,
       ~code: string=?,
       ~reason: Js.t('reason)=?,
       unit
@@ -88,7 +79,7 @@ module Socket = {
     "disconnect";
   let disconnect =
       (
-        ~callback: option(function_)=?,
+        ~callback: option(unit => unit)=?,
         ~code: option(string)=?,
         ~reason: option(Js.t('reason))=?,
         socket,
@@ -107,13 +98,13 @@ module Socket = {
 };
 
 module Presence = {
-  open Abstract;
+  // open Abstract;
   type nonrec t = {
     .
-    [@meth] "onJoin": function_ => void,
-    [@meth] "onLeave": function_ => void,
-    [@meth] "onSync": function_ => void,
-    [@meth] "list": function_ => any,
+    [@meth] "onJoin": (unit => unit) => unit,
+    [@meth] "onLeave": (unit => unit) => unit,
+    [@meth] "onSync": (unit => unit) => unit,
+    [@meth] "list": (unit => unit) => Js.Json.t,
     [@meth] "inPendingSyncState": unit => bool,
   };
 

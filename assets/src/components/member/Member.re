@@ -54,7 +54,7 @@ let reducer = (state, action) =>
 
 [@react.component]
 let make = (~token, ~userName, ~userId, ()) => {
-  let (_state, dispatch) = React.useReducer(reducer, initialState);
+  let (_, dispatch) = React.useReducer(reducer, initialState);
   let handleSync = (topic, loggedInUsers) => {
     let _ = Js.log(("handleSync:" ++ topic, loggedInUsers));
 
