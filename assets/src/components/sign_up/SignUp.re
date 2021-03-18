@@ -70,7 +70,7 @@ let getError = (field, errors) =>
   |> (
     errors =>
       switch (errors) {
-      | Some((_, msgs)) => str(List.hd(msgs))
+      | Some((_, msgs)) => React.string(List.hd(msgs))
       | None => ReasonReact.null
       }
   );
@@ -147,8 +147,8 @@ let make = (~handleSubmit, ()) => {
   <div>
     {switch (state) {
      | Display => ReasonReact.null
-     | DisplayWithErrors(error) => <p> {str(error)} </p>
-     | Loading => <p> {str("Loading...")} </p>
+     | DisplayWithErrors(error) => <p> {React.string(error)} </p>
+     | Loading => <p> {React.string("Loading...")} </p>
      }}
     <SpecialForm
       initialState={name: "", email: "", password: ""}
@@ -161,7 +161,7 @@ let make = (~handleSubmit, ()) => {
             load(form);
           }}>
           <div className="form-group">
-            <label htmlFor="registerUserName"> {str("Name: ")} </label>
+            <label htmlFor="registerUserName"> {React.string("Name: ")} </label>
             <input
               id="registerUserName"
               placeholder="Name"
@@ -175,7 +175,7 @@ let make = (~handleSubmit, ()) => {
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="registerEmail"> {str("Email: ")} </label>
+            <label htmlFor="registerEmail"> {React.string("Email: ")} </label>
             <input
               id="registerUserEmail"
               placeholder="Email"
@@ -190,7 +190,7 @@ let make = (~handleSubmit, ()) => {
           </div>
           <div className="form-group">
             <label htmlFor="registerUserPassword">
-              {str("Password: ")}
+              {React.string("Password: ")}
             </label>
             <input
               id="registerUserPassword"
@@ -205,7 +205,7 @@ let make = (~handleSubmit, ()) => {
               {getError(Password, form.errors)}
             </div>
           </div>
-          <button className="btn btn-primary"> {str("Sign Up")} </button>
+          <button className="btn btn-primary"> {React.string("Sign Up")} </button>
         </form>;
       }}
     />

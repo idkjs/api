@@ -34,7 +34,7 @@ module Config = {
 
 module Router = CreateRouter.Make(Config);
 
-let str = React.string;
+
 
 [@react.component]
 let make = () => {
@@ -43,33 +43,33 @@ let make = () => {
       <nav
         role="navigation" className="navbar navbar-expand navbar-dark bg-dark">
         <a className="navbar-brand" href="#">
-          {str("Phoenix ReasonML client")}
+          {React.string("Phoenix ReasonML client")}
         </a>
         <div>
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link href={Config.toUrl(Home)} label={() => str("Home")} />
+              <Link href={Config.toUrl(Home)} label={() => React.string("Home")} />
             </li>
             <li className="nav-item">
-              <Link href={Config.toUrl(Users)} label={() => str("Users")} />
+              <Link href={Config.toUrl(Users)} label={() => React.string("Users")} />
             </li>
             <li className="nav-item">
               <Link
                 href={Config.toUrl(Channels)}
-                label={() => str("Channels")}
+                label={() => React.string("Channels")}
               />
             </li>
             <li className="nav-item">
               <Link
                 href={Config.toUrl(SignIn)}
-                label={() => str("SignIn")}
+                label={() => React.string("SignIn")}
               />
             </li>
             <li className="nav-item">
-              <Link href={Config.toUrl(Forms)} label={() => str("Forms")} />
+              <Link href={Config.toUrl(Forms)} label={() => React.string("Forms")} />
             </li>
             <li className="nav-item">
-              <Link href={Config.toUrl(About)} label={() => str("About")} />
+              <Link href={Config.toUrl(About)} label={() => React.string("About")} />
             </li>
           </ul>
         </div>

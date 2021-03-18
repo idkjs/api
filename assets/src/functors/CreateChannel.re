@@ -1,7 +1,7 @@
 type socket = Phoenix.Socket.t;
 type channel = Phoenix.Channel.t;
 
-let str = React.string;
+
 
 /* Helpers */
 
@@ -128,8 +128,8 @@ module Make = (()) => {
     });
 
     switch (state) {
-    | Initialized => <div> {str("Initialized...")} </div>
-    | Left => <div> {str("Left...")} </div>
+    | Initialized => <div> {React.string("Initialized...")} </div>
+    | Left => <div> {React.string("Left...")} </div>
     | Joined(channel) => render(channel)
     };
   };

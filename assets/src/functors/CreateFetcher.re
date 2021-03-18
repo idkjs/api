@@ -1,6 +1,6 @@
 /* FUNCTOR */
 
-let str = React.string;
+
 
 module Make = (Config: {type data;}) => {
   type state =
@@ -44,8 +44,8 @@ module Make = (Config: {type data;}) => {
     });
 
     switch (state) {
-    | Loading => <div> {str("Loading...")} </div>
-    | Failure => <div> {str(failedMessage)} </div>
+    | Loading => <div> {React.string("Loading...")} </div>
+    | Failure => <div> {React.string(failedMessage)} </div>
     | Success(data) => render(data)
     };
   };

@@ -102,7 +102,7 @@ let member: member = {name: "yo!", role: "member"};
 Js.log(koko.name);
 Js.log(member.name);
 
-let str = React.string;
+
 
 [@react.component]
 let make = () => {
@@ -110,5 +110,5 @@ let make = () => {
     Js.log("Mounted!");
     None;
   });
-  <div> <h2> {str("Channels")} </h2> </div>;
+  <div> <h2> {React.string("Channels")} </h2> </div>;
 };

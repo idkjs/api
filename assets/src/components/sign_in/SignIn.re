@@ -42,7 +42,7 @@ let rules = [
 
 module SpecialForm = CreateForm.Make(Configuration);
 
-let str = React.string;
+
 
 let first = list => List.length(list) > 0 ? Some(List.hd(list)) : None;
 
@@ -52,7 +52,7 @@ let getError = (field, errors) =>
   |> (
     errors =>
       switch (errors) {
-      | Some((_, msgs)) => str(List.hd(msgs))
+      | Some((_, msgs)) => React.string(List.hd(msgs))
       | None => React.null
       }
   );
@@ -125,8 +125,8 @@ let make = (~handleSubmit, ()) => {
   <div>
     {switch (state) {
      | Display => React.null
-     | DisplayWithErrors(error) => <p> {str(error)} </p>
-     | Loading => <p> {str("Loading...")} </p>
+     | DisplayWithErrors(error) => <p> {React.string(error)} </p>
+     | Loading => <p> {React.string("Loading...")} </p>
      }}
     <SpecialForm
       initialState={name: "", password: ""}
@@ -139,7 +139,7 @@ let make = (~handleSubmit, ()) => {
             load(form);
           }}>
           <div className="form-group">
-            <label htmlFor="userName"> {str("Name: ")} </label>
+            <label htmlFor="userName"> {React.string("Name: ")} </label>
             <input
               id="userName"
               placeholder="Name"
@@ -153,7 +153,7 @@ let make = (~handleSubmit, ()) => {
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="userPassword"> {str("Password: ")} </label>
+            <label htmlFor="userPassword"> {React.string("Password: ")} </label>
             <input
               id="userPassword"
               placeholder="Password"
@@ -167,7 +167,7 @@ let make = (~handleSubmit, ()) => {
               {getError(Password, form.errors)}
             </div>
           </div>
-          <button className="btn btn-primary"> {str("Sign In")} </button>
+          <button className="btn btn-primary"> {React.string("Sign In")} </button>
         </form>;
       }}
     />

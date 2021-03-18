@@ -30,7 +30,7 @@ let handleEvent = (event, response) => {
   ();
 };
 
-let str = React.string;
+
 
 type presence = Abstract.PresenceData.t;
 
@@ -62,9 +62,9 @@ let make = (~token, ~userName, ~userId, ()) => {
   };
 
   <div>
-    <h2> {str(userName)} </h2>
-    <p> {str("Id: " ++ string_of_int(userId))} </p>
-    <p> {str("Token: " ++ token)} </p>
+    <h2> {React.string(userName)} </h2>
+    <p> {React.string("Id: " ++ string_of_int(userId))} </p>
+    <p> {React.string("Token: " ++ token)} </p>
     <SpecialSocket
       endPoint
       socketOpts={socketOpts(token)}
@@ -74,7 +74,7 @@ let make = (~token, ~userName, ~userId, ()) => {
         let systemTopic = "system";
         let privateTopic = "user:" ++ string_of_int(userId);
         <div>
-          <p> {str("Socket connected!")} </p>
+          <p> {React.string("Socket connected!")} </p>
           <SpecialChannel
             topic=systemTopic
             socket
@@ -85,7 +85,7 @@ let make = (~token, ~userName, ~userId, ()) => {
             render={channel => {
               Js.log("Channel joined with topic : " ++ channel##topic);
               <p>
-                {str("Channel connected with topic : " ++ systemTopic)}
+                {React.string("Channel connected with topic : " ++ systemTopic)}
               </p>;
             }}
           />
@@ -97,7 +97,7 @@ let make = (~token, ~userName, ~userId, ()) => {
             render={channel => {
               Js.log("Channel joined with topic : " ++ channel##topic);
               <p>
-                {str("Channel connected with topic : " ++ privateTopic)}
+                {React.string("Channel connected with topic : " ++ privateTopic)}
               </p>;
             }}
           />

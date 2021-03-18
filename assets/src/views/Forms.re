@@ -44,7 +44,7 @@ let rules = [
 
 module SpecialForm = CreateForm.Make(Configuration);
 
-let str = React.string;
+
 
 let first = list => List.length(list) > 0 ? Some(List.hd(list)) : None;
 
@@ -54,7 +54,7 @@ let getError = (field, errors) =>
   |> (
     errors =>
       switch (errors) {
-      | Some((_, msgs)) => str(List.hd(msgs))
+      | Some((_, msgs)) => React.string(List.hd(msgs))
       | None => React.null
       }
   );
@@ -76,7 +76,7 @@ let make = (~handleSubmit) => {
           handleSubmit(form.values);
         }}>
         <label>
-          {str("UserName: ")}
+          {React.string("UserName: ")}
           <br />
           <input
             value={form.values.userName}
@@ -85,7 +85,7 @@ let make = (~handleSubmit) => {
         </label>
         <p> {getError(UserName, form.errors)} </p>
         <label>
-          {str("Repeat UserName: ")}
+          {React.string("Repeat UserName: ")}
           <br />
           <input
             value={form.values.repeatUserName}
@@ -94,7 +94,7 @@ let make = (~handleSubmit) => {
         </label>
         <p> {getError(RepeatUserName, form.errors)} </p>
         <br />
-        <button> {str("Submit")} </button>
+        <button> {React.string("Submit")} </button>
       </form>;
     }}
   />;

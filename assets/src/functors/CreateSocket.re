@@ -1,5 +1,5 @@
 type socket = Phoenix.Socket.t;
-let str = React.string;
+
 
 module Make = (()) => {
   type state =
@@ -57,8 +57,8 @@ module Make = (()) => {
     });
 
     switch (state) {
-    | Initialized => <div> {str("Initialized...")} </div>
-    | Disconnected => <div> {str("Disconnected...")} </div>
+    | Initialized => <div> {React.string("Initialized...")} </div>
+    | Disconnected => <div> {React.string("Disconnected...")} </div>
     | Connected(socket) => render(socket)
     };
   };

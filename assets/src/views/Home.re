@@ -1,7 +1,7 @@
-// let str = React.string;
+//
 
 // [@react.component]
-// let make = () => <div> <h2> {str("Home")} </h2> </div>;
+// let make = () => <div> <h2> {React.string("Home")} </h2> </div>;
 type sessionData = Abstract.SessionData.t;
 
 type signMode =
@@ -39,7 +39,7 @@ let initialState = {
   signMode: SignInMode,
 };
 
-let str = React.string;
+
 
 let reducer = (state, action) =>
   switch (action) {
@@ -108,14 +108,14 @@ let make = () => {
   });
 
   if (state.loading) {
-    <p> {str("Loading...")} </p>;
+    <p> {React.string("Loading...")} </p>;
   } else {
     <div>
       <header>
         {switch (state.bootupTime) {
          | Some(bootupTime) =>
-           <p> {str(Tools.formatTimestamp(bootupTime))} </p>
-         | None => <p> {str("Bootup time is not set!")} </p>
+           <p> {React.string(Tools.formatTimestamp(bootupTime))} </p>
+         | None => <p> {React.string("Bootup time is not set!")} </p>
          }}
       </header>
       <main role="main" className="container">
@@ -124,7 +124,7 @@ let make = () => {
                <button
                  onClick={_event => dispatch(Logout)}
                  className="btn btn-link">
-                 {str("Log Out")}
+                 {React.string("Log Out")}
                </button>
                {switch (state.sessionData) {
                 | Some(sessionData) =>
@@ -146,7 +146,7 @@ let make = () => {
                <button
                  onClick={_event => dispatch(ToggleSignMode)}
                  className="btn btn-link">
-                 {str(toggleLabelOfSignMode(state.signMode))}
+                 {React.string(toggleLabelOfSignMode(state.signMode))}
                </button>
              </div>}
       </main>

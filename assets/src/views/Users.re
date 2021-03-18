@@ -38,7 +38,7 @@ let fetchUsers = () =>
     |> catch(_err => resolve(None))
   );
 
-let str = React.string;
+
 
 [@react.component]
 let make = () => {
@@ -70,18 +70,18 @@ let make = () => {
   switch (state) {
   | NotAsked =>
     <div>
-      {str("Click to start load Users")}
-      <button onClick={_event => loadUsers()}> {str("Load Users")} </button>
+      {React.string("Click to start load Users")}
+      <button onClick={_event => loadUsers()}> {React.string("Load Users")} </button>
     </div>
-  | Loading => <div> {str("Loading...")} </div>
-  | Failure => <div> {str("Something went wrong!")} </div>
+  | Loading => <div> {React.string("Loading...")} </div>
+  | Failure => <div> {React.string("Something went wrong!")} </div>
   | Success(users) =>
     <div>
-      <h2> {str("Users")} </h2>
+      <h2> {React.string("Users")} </h2>
       <ul>
         {users
          |> List.map(user =>
-              <li key={string_of_int(user.id)}> {str(user.name)} </li>
+              <li key={string_of_int(user.id)}> {React.string(user.name)} </li>
             )
          |> Array.of_list
          |> React.array}
