@@ -8,11 +8,8 @@ dependencies:
   react: 17.0.1
   react-dom: 17.0.1_react@17.0.1
   reason-react: 0.9.1_5a29a74ced3fdef720616aaf4e03fe8e
-  reason-react-compat: 2.0.0_dae866e1fca4f4910258d9a60d41e7ac
-  reason-react-update: 2.0.0_dae866e1fca4f4910258d9a60d41e7ac
   yarn: 1.22.10
 devDependencies:
-  bloodyowl-upgrade-reason-react: 1.0.0
   bs-platform: 9.0.2
   copy-webpack-plugin: 5.1.2_webpack@4.46.0
   css-loader: 3.6.0_webpack@4.46.0
@@ -22,7 +19,6 @@ devDependencies:
   optimize-css-assets-webpack-plugin: 5.0.4_webpack@4.46.0
   sass-loader: 7.3.1_webpack@4.46.0
   uglifyjs-webpack-plugin: 2.2.0_webpack@4.46.0
-  upgrade-reason-react: github.com/chenglou/upgrade-reason-react/e7ab9922060aac86578fd4e08c84b0d8246c5d83
   url-loader: 2.3.0_file-loader@4.3.0+webpack@4.46.0
   webpack: 4.46.0_webpack-cli@3.3.12
   webpack-cli: 3.3.12_webpack@4.46.0
@@ -488,12 +484,6 @@ packages:
       node: 0.4 || >=0.5.8
     resolution:
       integrity: sha1-E+v+d4oDIFz+A3UUgeu0szAMEmo=
-  /bloodyowl-upgrade-reason-react/1.0.0:
-    dev: true
-    hasBin: true
-    requiresBuild: true
-    resolution:
-      integrity: sha512-TQmKZf++Hs0TW1wqLzRmx13cUjVuPHZPWr0PtVhH7qRInqMmpefHrYjdTlO55ZgvQvKyx5aCFp8V6SNgfwRivw==
   /bluebird/3.7.2:
     dev: true
     resolution:
@@ -637,10 +627,6 @@ packages:
     requiresBuild: true
     resolution:
       integrity: sha512-Ye9JqJ4Oa7mcjjoOVRYI8Uc2Cf8N7jQLWDcdUplY7996d/YErSR7WitmV7XnSwr4EvdrbwjEsg1NxNjUQv3ChA==
-  /buffer-crc32/0.2.13:
-    dev: true
-    resolution:
-      integrity: sha1-DTM+PwDqxQqhRUq9MO+MKl2ackI=
   /buffer-from/1.1.1:
     dev: true
     resolution:
@@ -1648,12 +1634,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==
-  /fd-slicer/1.1.0:
-    dependencies:
-      pend: 1.2.0
-    dev: true
-    resolution:
-      integrity: sha1-JcfInLH5B3+IkbvmHY85Dq4lbx4=
   /figgy-pudding/3.5.2:
     dev: true
     resolution:
@@ -3368,10 +3348,6 @@ packages:
       node: '>=0.12'
     resolution:
       integrity: sha512-4Ejy1OPxi9f2tt1rRV7Go7zmfDQ+ZectEQz3VGUQhgq62HtIRPDyG/JtnwIxs6x3uNMwo2V7q1fMvKjb+Tnpqg==
-  /pend/1.2.0:
-    dev: true
-    resolution:
-      integrity: sha1-elfrVQpng/kRUzH89GY9XI4AelA=
   /performance-now/2.1.0:
     dev: true
     resolution:
@@ -3986,30 +3962,6 @@ packages:
     optional: true
     resolution:
       integrity: sha512-cMhu7c/8rdhkHXWsY+osBhfSy0JikwpHK/5+imo+LpeasTF8ouErHrlYkwT0++njiyuDvc7OFY5T3ukvZ8qmFQ==
-  /reason-react-compat/2.0.0_dae866e1fca4f4910258d9a60d41e7ac:
-    dependencies:
-      react: 17.0.1
-      react-dom: 17.0.1_react@17.0.1
-      reason-react: 0.9.1_5a29a74ced3fdef720616aaf4e03fe8e
-    dev: false
-    peerDependencies:
-      react: ^16.8.0
-      react-dom: ^16.8.0
-      reason-react: '>=0.7.0'
-    resolution:
-      integrity: sha512-CJo1zJao+wCbPu8hiqbta4tQy0r70dKF+KMbp6Y1mIRYvAzhMp6eAY4lMlfNz2l19knnpnrW83F6/bYBB+ehtA==
-  /reason-react-update/2.0.0_dae866e1fca4f4910258d9a60d41e7ac:
-    dependencies:
-      react: 17.0.1
-      react-dom: 17.0.1_react@17.0.1
-      reason-react: 0.9.1_5a29a74ced3fdef720616aaf4e03fe8e
-    dev: false
-    peerDependencies:
-      react: ^16.8.0
-      react-dom: ^16.8.0
-      reason-react: '>=0.7.0'
-    resolution:
-      integrity: sha512-0dHC8p0GKYH2TMCtw8f7tuJTOwJonuB2mg8R0RxjuK5yr9Ne/cIoZOKqjGiwGZkjU9pcT4xowS5OaaBuJJuj9Q==
   /reason-react/0.9.1_5a29a74ced3fdef720616aaf4e03fe8e:
     dependencies:
       bs-platform: 9.0.2
@@ -5195,37 +5147,10 @@ packages:
     requiresBuild: true
     resolution:
       integrity: sha512-IanQGI9RRPAN87VGTF7zs2uxkSyQSrSPsju0COgbsKQOOXr5LtcVPeyXWgwVa0ywG3d8dg6kSYKGBuYK021qeA==
-  /yauzl/2.10.0:
-    dependencies:
-      buffer-crc32: 0.2.13
-      fd-slicer: 1.1.0
-    dev: true
-    resolution:
-      integrity: sha1-x+sXyT4RLLEIb6bY5R+wZnt5pfk=
-  github.com/bsansouci/bsb-native/84604c9f6a5611eed68372efdb575c00a3e72813:
-    dependencies:
-      yauzl: 2.10.0
-    dev: true
-    hasBin: true
-    name: bs-platform
-    requiresBuild: true
-    resolution:
-      tarball: https://codeload.github.com/bsansouci/bsb-native/tar.gz/84604c9f6a5611eed68372efdb575c00a3e72813
-    version: 3.2.0
-  github.com/chenglou/upgrade-reason-react/e7ab9922060aac86578fd4e08c84b0d8246c5d83:
-    dependencies:
-      bs-platform: github.com/bsansouci/bsb-native/84604c9f6a5611eed68372efdb575c00a3e72813
-    dev: true
-    name: upgrade-reason-react
-    requiresBuild: true
-    resolution:
-      tarball: https://codeload.github.com/chenglou/upgrade-reason-react/tar.gz/e7ab9922060aac86578fd4e08c84b0d8246c5d83
-    version: 0.0.1
 specifiers:
   '@glennsl/bs-json': ^5.0.2
   '@glennsl/bs-revamp': ^0.2.0
   axios: ^0.21.1
-  bloodyowl-upgrade-reason-react: ^1.0.0
   bootstrap: ^4.6.0
   bs-axios: ^0.0.43
   bs-platform: ^9.0.2
@@ -5239,11 +5164,8 @@ specifiers:
   react: ^17.0.1
   react-dom: ^17.0.1
   reason-react: '>=0.9.1'
-  reason-react-compat: ^2.0.0
-  reason-react-update: ^2.0.0
   sass-loader: ^7.1.0
   uglifyjs-webpack-plugin: ^2.1.3
-  upgrade-reason-react: github:chenglou/upgrade-reason-react#0.6.0-to-0.7.0
   url-loader: ^2.1.0
   webpack: ^4.38.0
   webpack-cli: ^3.3.6

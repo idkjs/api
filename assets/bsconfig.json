@@ -20,9 +20,7 @@
         "@glennsl/bs-revamp",
         "reason-react",
         "bs-axios",
-        "@glennsl/bs-json",
-        "reason-react-update",
-        "reason-react-compat"
+        "@glennsl/bs-json"
     ],
     "refmt": 3,
     "warning": {

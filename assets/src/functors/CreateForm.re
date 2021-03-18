@@ -60,18 +60,19 @@ module Make = (Config: Config) => {
 
   [@react.component]
   let make = (~initialState, ~rules, ~render, ()) => {
-    let (state, send) =
-      ReactUpdateLegacy.useReducerWithMapState(
-        () => {errors: [], values: initialState},
-        (action, state) =>
+    let (state, dispatch) =
+      React.useReducer(
+        (state, action) =>
           switch (action) {
           | UpdateValues(name, value) =>
             let values = Config.update(name, value, state.values);
-            Update({values, errors: validation(rules, Config.get, values)});
+            {values, errors: validation(rules, Config.get, values)};
           },
+        {errors: [], values: initialState},
       );
 
-    let handleChange = (field, value) => send(UpdateValues(field, value));
+    let handleChange = (field, value) =>
+      dispatch(UpdateValues(field, value));
     render({form: state, handleChange});
   };
 };
