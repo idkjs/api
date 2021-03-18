@@ -69,6 +69,6 @@ config :phoenix, :plug_init_mode, :runtime
 config :api, Api.Repo,
   username: "postgres",
   password: "postgres",
-  database: "api_dev",
+  database: "gorille_dev",
   hostname: "localhost",
   pool_size: 10
