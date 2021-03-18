@@ -9,7 +9,7 @@ let socketOpts = {
 
 let mySocket = Phoenix.Socket.init(~opts=socketOpts, endPoint);
 
-Phoenix.Socket.connect(mySocket)|>ignore;
+Phoenix.Socket.connect(mySocket) |> ignore;
 
 mySocket##onOpen(() => Js.log(mySocket##isConnected()));
 
@@ -74,15 +74,16 @@ Js.log2("CHANNEL : ", myChannel);
 
 [@bs.val] external setTimeout: (unit => unit, int) => float = "setTimeout";
 
-let _ =setTimeout(
-  () => {
-    Js.log(mySocket##isConnected());
-    let _ = Phoenix.Socket.disconnect(mySocket);
-    Js.log("Disconnected!");
-    Js.log(mySocket##isConnected());
-  },
-  10000,
-);
+let _ =
+  setTimeout(
+    () => {
+      Js.log(mySocket##isConnected());
+      let _ = Phoenix.Socket.disconnect(mySocket);
+      Js.log("Disconnected!");
+      Js.log(mySocket##isConnected());
+    },
+    10000,
+  );
 
 type user = {
   name: string,

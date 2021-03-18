@@ -40,7 +40,8 @@ let str = React.string;
 
 let reducer = (action, state) =>
   switch (action) {
-  | AppBootup => ReactCompat.Update({...state, bootupTime: Some(Js.Date.now())})
+  | AppBootup =>
+    ReactCompat.Update({...state, bootupTime: Some(Js.Date.now())})
   | Login(sessionData) =>
     UpdateWithSideEffects(
       {...state, isAuthenticated: true, sessionData: Some(sessionData)},

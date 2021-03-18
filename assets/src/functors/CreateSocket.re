@@ -67,5 +67,4 @@ module Make = (()) => {
         | Connected(socket) => render(socket)
         },
     });
-
 };

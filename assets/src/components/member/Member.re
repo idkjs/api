@@ -7,14 +7,16 @@ module SpecialChannel =
 let endPoint = "ws://localhost:4000/socket";
 
 let socketOpts = token => {
-let token = {"token": token};
+  let token = {"token": token};
   {
-  "params": {
-    token
-  },
-  "timeout": 10000,
-  "logger": (kind, msg, data) => Js.log(kind ++ ": " ++ msg ++ ", " ++ data),
-}};
+    "params": {
+      token;
+    },
+    "timeout": 10000,
+    "logger": (kind, msg, data) =>
+      Js.log(kind ++ ": " ++ msg ++ ", " ++ data),
+  };
+};
 
 let handleReceive = (event, any) =>
   switch (event) {

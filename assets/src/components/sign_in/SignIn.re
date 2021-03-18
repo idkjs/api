@@ -133,7 +133,7 @@ let make = (~handleSubmit, ()) =>
           initialState={name: "", password: ""}
           rules
           render={(formState: SpecialForm.form) => {
-      let {form, handleChange} = formState;
+            let {form, handleChange} = formState;
             <form
               onSubmit={e => {
                 preventDefault(e);
@@ -169,7 +169,7 @@ let make = (~handleSubmit, ()) =>
                 </div>
               </div>
               <button className="btn btn-primary"> {str("Sign In")} </button>
-            </form>
+            </form>;
           }}
         />
       </div>,
