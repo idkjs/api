@@ -1,0 +1,45 @@
+{
+    "name": "rescript-elixir-starter",
+    "version": "0.1.0",
+    "scripts": {
+        "build": "npm-run-all re-build bundle-build",
+        "start": "npm-run-all -lnpr re-watch bundle-watch",
+        "server": "mix phx.server",
+        "dev": "npm-run-all -lnpr re-watch bundle-watch server",
+        "bundle-watch": "parcel watch assets/src/index.bs.js --dist-dir priv/static/js",
+        "bundle-build": "parcel build assets/src/index.bs.js --dist-dir priv/static/js",
+        "re-build": "bsb -make-world",
+        "re-watch": "bsb -make-world -w -ws _ ",
+        "re-clean": "bsb -clean-world",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "ReScript",
+        "ReasonML",
+        "Parcel"
+    ],
+    "author": "Alain Armand",
+    "license": "MIT",
+    "dependencies": {
+        "@glennsl/bs-json": "^5.0.2",
+        "bs-fetch": "^0.6.2",
+        "phoenix": "file:./deps/phoenix",
+        "phoenix_html": "file:./deps/phoenix_html",
+        "react": "^17.0.1",
+        "react-dom": "^17.0.1",
+        "reason-react": "^0.9.1"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.13.10",
+        "bs-platform": "^9.0.2",
+        "bsb-js": "^1.1.7",
+        "npm-run-all": "^4.1.5",
+        "parcel": "^2.0.0-beta.2",
+        "parcel-namer-rewrite": "^2.0.0-beta.1-7"
+    },
+    "parcel-namer-rewrite": {
+        "rules": {
+            "index.bs.js": "app.js"
+        }
+    }
+}

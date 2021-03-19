@@ -5,7 +5,7 @@ type channel = Phoenix.Channel.t;
 
 /* Helpers */
 
-let putOn = (event, f: Js_json.t => unit, channel) => {
+let putOn = (event, f: Js.Json.t => unit, channel) => {
   let _ = channel##on(event, f);
   channel;
 };
@@ -15,12 +15,12 @@ let putReceive = (event, handleReceive, push) => {
   push;
 };
 
-let putOnError = (f: Js_json.t => unit, channel) => {
+let putOnError = (f: Js.Json.t => unit, channel) => {
   let _ = channel##onError(f);
   channel;
 };
 
-let putOnClose = (f: Js_json.t => unit, channel) => {
+let putOnClose = (f: Js.Json.t => unit, channel) => {
   let _ = channel##onClose(f);
   channel;
 };

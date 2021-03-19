@@ -18,7 +18,7 @@ mySocket##onClose(() => Js.log("Socket closed!"));
 
 Js.log2("SOCKET : ", mySocket);
 
-let putOn = (event, f: Js_json.t => unit, channel) => {
+let putOn = (event, f: Js.Json.t => unit, channel) => {
   let _ = channel##on(event, f);
   channel;
 };
